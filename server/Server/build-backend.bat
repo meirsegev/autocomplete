@@ -1,0 +1,1 @@
+docker build -t autocomplete/backend:1.0.0 -f ./Dockerfile .

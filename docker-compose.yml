@@ -1,0 +1,19 @@
+version: '3.7'
+
+services:
+  backend:
+    image: autocomplete/backend:1.0.0
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - Urls=http://*:5000
+      - ASPNETCORE_ENVIRONMENT=Development
+
+  frontend:
+    image: autocomplete/frontend:1.0.0
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      NGINX_ENVSUBST_TEMPLATE_SUFFIX: ".template"
