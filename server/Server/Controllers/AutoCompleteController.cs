@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -31,11 +32,11 @@ namespace Server.Controllers
 
         // GET api/autocomplete
         [HttpGet("get-suggestions")]
-        public async Task<ActionResult<IEnumerable<string>>> AutoCompleteAsync([FromQuery] string prefix)
+        public async Task<ActionResult<IEnumerable<string>>> AutoCompleteAsync([FromQuery] string prefix, CancellationToken ct)
         {
             try
             {
-                var res = await _autoCompleteService.GetSuggestionsAsync(prefix);
+                var res = await _autoCompleteService.GetSuggestionsAsync(prefix, ct);
                 return res;
             }
             catch(Exception ex)

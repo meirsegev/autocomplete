@@ -20,17 +20,18 @@ namespace Server.Services
             _logger = logger;
         }
 
-        public async Task<List<string>> GetSuggestionsAsync(string prefix)
+        public async Task<List<string>> GetSuggestionsAsync(string prefix, CancellationToken ct)
         {
             if (!_isInitialized)
                 return new List<string>();
 
-            var t = Task.Run(() => TrieStruct.SearchWord(_trieNode, prefix));
+            var t = Task.Run(() => TrieStruct.SearchWord(_trieNode, prefix), ct);
             await t;
+
             return t.Result;
         }
 
-        public async Task InitializeAsync()
+        public async Task InitializeAsync(CancellationToken ct)
         {
             if (_isInitialized)
                 return;
@@ -41,9 +42,10 @@ namespace Server.Services
             {
                 var words = GetInitialWordsList();
                 _trieNode = TrieStruct.BuildTrieStruct(words);
-            });
+            }, ct);
 
             await t;
+
             _isInitialized = true;
         }
 
@@ -56,7 +58,7 @@ namespace Server.Services
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            await InitializeAsync();
+            await InitializeAsync(cancellationToken);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)

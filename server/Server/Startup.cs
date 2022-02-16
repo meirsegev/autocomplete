@@ -28,7 +28,7 @@ namespace Server
         {
             services.AddLogging();
             services.AddControllers();
-
+            services.AddMvc();
             services.AddHostedService<AutoCompleteService>()
                 .AddSingleton<IAutoCompleteService>(sp => sp
                 .GetServices<IHostedService>()
