@@ -15,8 +15,4 @@ export class AutoCompleteService {
    getSuggestions(prefix: string): Observable<string[]> {
     return this.http.get<string[]>(`${environment.apiBase}/api/auto-complete/get-suggestions?prefix=${prefix.toLowerCase()}`);
    }
-
-   initialize(): Observable<any> {
-    return this.http.post<any>(`${environment.apiBase}/api/auto-complete/initialize`, {})
-   }
 } 

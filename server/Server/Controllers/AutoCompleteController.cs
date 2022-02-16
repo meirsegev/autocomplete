@@ -29,20 +29,20 @@ namespace Server.Controllers
             _autoCompleteService = autoCompleteService;
         }
 
-        // TBD - think where is the correct entry point for that
-        [HttpPost("initialize")]
-        public async Task<ActionResult> Initialize()
-        {
-            await _autoCompleteService.InitializeAsync();
-            return new OkResult();
-        }
-
         // GET api/autocomplete
         [HttpGet("get-suggestions")]
         public async Task<ActionResult<IEnumerable<string>>> AutoCompleteAsync([FromQuery] string prefix)
         {
-           var res = await _autoCompleteService.GetSuggestionsAsync(prefix);
-           return res;
+            try
+            {
+                var res = await _autoCompleteService.GetSuggestionsAsync(prefix);
+                return res;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return StatusCode(500);
+            }
         }
     }
 }

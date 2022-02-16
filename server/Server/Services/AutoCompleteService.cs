@@ -11,7 +11,6 @@ namespace Server.Services
 {
     public class AutoCompleteService : IAutoCompleteService
     {
-        public bool IsInitialized() => _isInitialized;
         private bool _isInitialized = false;
         private TrieNode _trieNode = null;
         private ILogger<AutoCompleteService> _logger;
@@ -26,7 +25,7 @@ namespace Server.Services
             if (!_isInitialized)
                 return new List<string>();
 
-            var t = Task.Run(() => TrieNode.SearchWord(_trieNode, prefix));
+            var t = Task.Run(() => TrieStruct.SearchWord(_trieNode, prefix));
             await t;
             return t.Result;
         }
@@ -41,15 +40,17 @@ namespace Server.Services
             var t = Task.Run(() =>
             {
                 var words = GetInitialWordsList();
-                _trieNode = TrieNode.BuildTrieStruct(words);
+                _trieNode = TrieStruct.BuildTrieStruct(words);
             });
+
             await t;
             _isInitialized = true;
         }
 
+        // TBD - connect to db with async call
         private List<string> GetInitialWordsList()
         {
-            var cities = City.GetAllCities();
+            var cities = CsvParser.GetAllCities();
             return cities.Select(v => v.Name).ToList();
         }
 

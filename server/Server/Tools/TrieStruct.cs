@@ -5,18 +5,8 @@ using System.Threading.Tasks;
 
 namespace Server.Tools
 {
-    public class TrieNode
+    public class TrieStruct
     {
-        public TrieNode() { }
-        public Dictionary<char, TrieNode> InnerNodes = new Dictionary<char, TrieNode>();
-        public List<string> Words = new List<string>();
-        public bool ContainsKey(char key) => InnerNodes.ContainsKey(key);
-        public TrieNode GetNodeByKey(char key) => InnerNodes[key];
-        public void AddWord(string word)
-        {
-            Words.Add(word);
-        }
-
         public static TrieNode BuildTrieStruct(List<string> words)
         {
             var rootNode = new TrieNode();

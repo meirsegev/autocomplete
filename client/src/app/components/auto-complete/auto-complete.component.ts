@@ -25,14 +25,6 @@ export class AutoCompleteComponent implements OnInit, AfterViewInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    console.log('initialize...');
-    this.autoCompleteService.initialize().subscribe(
-      () => {
-        console.log('auto complete service initialized')
-      }, 
-      (err) => {
-        console.log(err);
-    })
   }
 
   ngAfterViewInit() {

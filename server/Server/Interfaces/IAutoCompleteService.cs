@@ -10,6 +10,5 @@ namespace Server.Interfaces
     {
         Task <List<string>> GetSuggestionsAsync(string prefix);
         Task InitializeAsync();
-        bool IsInitialized();
     }
 }

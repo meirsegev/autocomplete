@@ -30,7 +30,7 @@ namespace Server
             services.AddControllers();
 
             services.AddHostedService<AutoCompleteService>()
-                .AddSingleton<IAutoCompleteService>(x => x
+                .AddSingleton<IAutoCompleteService>(sp => sp
                 .GetServices<IHostedService>()
                 .OfType<AutoCompleteService>()
                 .First());
