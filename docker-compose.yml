@@ -2,7 +2,10 @@ version: '3.7'
 
 services:
   backend:
-    image: autocomplete/backend:1.0.0
+    image: autocomplete/backend:1.0.1
+    build:
+      context: .
+      dockerfile: ./server/Server/Dockerfile
     restart: always
     ports:
       - "5000:5000"
@@ -11,7 +14,10 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
 
   frontend:
-    image: autocomplete/frontend:1.0.0
+    image: autocomplete/frontend:1.0.1
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
     restart: always
     ports:
       - "8888:80"

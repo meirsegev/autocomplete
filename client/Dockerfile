@@ -5,18 +5,18 @@ FROM node:12-alpine AS builder
 WORKDIR "/src/app"
 
 # npm install
-COPY ["package*.json", "/src/app/"]
+COPY ["client/package*.json", "/src/app/"]
 RUN npm install
 
 # build app
-COPY ["/", "/src/app/"]
+COPY ["client/", "/src/app/"]
 RUN npm run build:prod
 
 # copy the front end app and serve the app with nginx
 FROM nginx:1.19-alpine AS runtime
 
 # copy the nginx.confg as template because it has env variables in it
-COPY ["nginx/nginx.conf", "/etc/nginx/templates/default.conf.template"]
+COPY ["client/nginx/nginx.conf", "/etc/nginx/templates/default.conf.template"]
 COPY --from=builder /src/app/dist/client /app
 RUN ls -ll /app
 

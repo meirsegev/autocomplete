@@ -11,7 +11,7 @@ WORKDIR /src
 # 
 
 # Copy the main source project files
-COPY ./Server.csproj Server/
+COPY ./server/Server/Server.csproj Server/
 WORKDIR /src/Server/
 RUN dotnet restore -r linux-x64
 
@@ -19,7 +19,7 @@ RUN dotnet restore -r linux-x64
 # Build
 # 
 
-COPY . /src/Server/
+COPY ./server/Server/ /src/Server/
 RUN dotnet publish -r linux-x64 --no-restore -c Release -o /app
 
 ###############################################################################
