@@ -38,8 +38,6 @@ namespace Server.Services
             if (_isInitialized)
                 return;
 
-            // TBD - make this function thread safe for case that multiple users 
-            // connected in the same time.
             var t = Task.Run(() =>
             {
                 var words = GetInitialWordsList();
@@ -55,6 +53,8 @@ namespace Server.Services
         // TBD - connect to db with async call
         private List<string> GetInitialWordsList()
         {
+            // in real implementation this should be an asnyc read from db of
+            // all city names and priority
             var cities = CsvParser.GetAllCities();
             return cities.Select(v => v.Name).ToList();
         }
