@@ -38,8 +38,6 @@ namespace Server.Services
             if (_isInitialized)
                 return;
 
-            // TBD - make this function thread safe for case that multiple users 
-            // connected in the same time.
             var t = Task.Run(() =>
             {
                 var words = GetInitialWordsList();
