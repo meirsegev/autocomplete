@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { fromEvent, of, ReplaySubject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, repeat, tap, map, switchMap, finalize, takeUntil, catchError } from 'rxjs/operators';
+import { fromEvent, Observable, of, ReplaySubject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged, repeat, tap, map, switchMap, filter, finalize, takeUntil, catchError } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { AutoCompleteService } from 'src/app/services/auto-complete.service';
 
@@ -9,15 +9,16 @@ import { AutoCompleteService } from 'src/app/services/auto-complete.service';
   templateUrl: './auto-complete.component.html',
   styleUrls: ['./auto-complete.component.css']
 })
-export class AutoCompleteComponent implements OnInit, AfterViewInit, OnDestroy {
+export class AutoCompleteComponent implements OnInit, AfterViewInit {
 
   // ref to the searchInput element
   @ViewChild('searchInput') input?: ElementRef;
-
-  private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
-  suggestions: string[] = [];
   isLoading: boolean = false;
-  errorMsg: string = "";
+
+  // this observable is getting un-subscribe automatically by 
+  // angular framework due to the async pipe usage
+  suggestionsOb$: Observable<string[]>;
+  isShowSuggestions: boolean = true;
 
   constructor(
     private http: HttpClient,
@@ -28,48 +29,37 @@ export class AutoCompleteComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
+    // we are subscribing here(ngAfterViewInit) to the input element 
+    // to be sure we have a reference to the input child element
     const onKeyUpOb = fromEvent<any>(this.input?.nativeElement, 'keyup');
-    onKeyUpOb.pipe(
-        map(event => event.target.value),
-        debounceTime(300),
-        distinctUntilChanged(),
-        tap((v) => {
-          console.log("keyup event fired with:", v);
-          this.errorMsg = "";
-          this.isLoading = true;
-        }),
-        switchMap(prefix => this.autoCompleteService.getSuggestions(prefix as string)
-          .pipe(
-            finalize(() => {
-              this.isLoading = false;
-            })
-          )
-        ),
-        takeUntil(this.destroyed$),
-        catchError((err) => {
-          console.log('error handled:', err);
-          return of(null);
-        }),
-        repeat(), 
-      )
-      .subscribe(
-        data => {
-          console.log("data:", data);
-          this.suggestions = data?? [];
-        },
-        err => {
-          console.log("err:", err);
-        }
-      );
-  }
-
-  ngOnDestroy(): void {
-    this.destroyed$.next(true);
-    this.destroyed$.complete();
+    this.suggestionsOb$ = onKeyUpOb.pipe(
+      debounceTime(200),
+      filter(Boolean),
+      map(event => ((event as any).target.value)),
+      distinctUntilChanged(),
+      tap((v) => {
+        console.log("keyup event fired with:", v);
+        this.isLoading = true;
+      }),
+      switchMap(prefix => this.autoCompleteService.getSuggestions(prefix as string)
+        .pipe(
+          finalize(() => {
+            this.isLoading = false;
+            this.isShowSuggestions = true;
+          })
+        )
+      ),
+      catchError((err) => {
+        console.log('error handled:', err);
+        return of(null);
+      }),
+      repeat(),
+      map(response => response ?? [])
+    );
   }
 
   selected(ev: any) {
     (this.input?.nativeElement as HTMLInputElement).value = ev.innerText;
-    this.suggestions = [];
+    this.isShowSuggestions = false;
   }
 }

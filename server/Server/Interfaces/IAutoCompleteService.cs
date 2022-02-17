@@ -9,7 +9,7 @@ namespace Server.Interfaces
 {
     public interface IAutoCompleteService : IHostedService
     {
-        Task <List<string>> GetSuggestionsAsync(string prefix, CancellationToken ct);
+        List<string> GetSuggestions(string prefix);
         Task InitializeAsync(CancellationToken ct);
     }
 }

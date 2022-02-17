@@ -20,45 +20,41 @@ namespace Server.Services
             _logger = logger;
         }
 
-        public async Task<List<string>> GetSuggestionsAsync(string prefix, CancellationToken ct)
+        public List<string> GetSuggestions(string prefix)
         {
             if (!_isInitialized)
+            {
+                _logger.LogError("GetSuggestions was called before auto complete service initialization");
                 return new List<string>();
-
-            var t = Task.Run(() => TrieStruct.SearchWord(_trieNode, prefix), ct);
-            await t;
-
-            return t.Result;
+            }
+            return TrieStruct.SearchWord(_trieNode, prefix);
         }
 
         public async Task InitializeAsync(CancellationToken ct)
         {
-            _logger.LogDebug("Initiaizing AutoCompleteService");
+            _logger.LogDebug("Initialization of AutoCompleteService started ...");
 
             if (_isInitialized)
                 return;
-
-            var t = Task.Run(() =>
-            {
-                var words = GetInitialWordsList();
-                _trieNode = TrieStruct.BuildTrieStruct(words);
-            }, ct);
-
-            await t;
-
+                        
+            var words = await GetInitialWordsListAsync(ct);
+            _trieNode = TrieStruct.BuildTrieStruct(words);
+            
             _isInitialized = true;
             _logger.LogDebug("AutoCompleteService initialized");
         }
 
-        // TBD - connect to db with async call
-        private List<string> GetInitialWordsList()
+        private async Task<List<string>> GetInitialWordsListAsync(CancellationToken ct)
         {
             // in real implementation this should be an asnyc read from db of
-            // all city names and priority
-            var cities = CsvParser.GetAllCities();
+            // all city names and priority, here just from a file.
+            var cities = await CsvParser.GetAllCitiesAsync(ct);
             return cities.Select(v => v.Name).ToList();
         }
 
+        // This method is called before the server start serving requests,
+        // So at the moment the server start serving requests it will be
+        // ready to serve the auto-complete callss
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             await InitializeAsync(cancellationToken);

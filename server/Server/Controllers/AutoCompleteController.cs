@@ -30,15 +30,14 @@ namespace Server.Controllers
             _autoCompleteService = autoCompleteService;
         }
 
-        // GET api/autocomplete
+        // GET api/auto-complete/get-suggestions
         [HttpGet("get-suggestions")]
-        public async Task<ActionResult<IEnumerable<string>>> AutoCompleteAsync([FromQuery] string prefix, CancellationToken ct)
+        public ActionResult<IEnumerable<string>> AutoCompleteAsync([FromQuery] string prefix, CancellationToken ct)
         {
             try
             {
-                _logger.LogDebug($"get-suggestions called for: {prefix}");
-                var res = await _autoCompleteService.GetSuggestionsAsync(prefix, ct);
-                return res;
+                _logger.LogDebug($"get-suggestions called for prefix: {prefix}");
+                return _autoCompleteService.GetSuggestions(prefix);
             }
             catch(Exception ex)
             {

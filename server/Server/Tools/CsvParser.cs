@@ -3,19 +3,22 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Server.Tools
 {
     public class CsvParser
     {
-        public static List<CityModel> GetAllCities()
+        public async static Task<List<CityModel>> GetAllCitiesAsync(CancellationToken ct)
         {
-            List<CityModel> values = File.ReadAllLines("world-cities.csv")
-                                           .Skip(1)
-                                           .Select(v => FromCsv(v))
-                                           .Where(v => !string.IsNullOrEmpty(v.Name))
-                                           .ToList();
+            var lines = await File.ReadAllLinesAsync("world-cities.csv", ct);
+
+            List<CityModel> values = lines
+                                     .Skip(1)
+                                     .Select(v => FromCsv(v))
+                                     .Where(v => !string.IsNullOrEmpty(v.Name))
+                                     .ToList();
             return values;
         }
 
@@ -30,7 +33,7 @@ namespace Server.Tools
             city.Country = values[1];
             city.SubCountry = values[2];
             city.GeoId = Convert.ToInt32(values[3]);
-            
+
             return city;
         }
     }

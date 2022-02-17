@@ -11,10 +11,10 @@
 <form autocomplete="off">
     <div class="autocomplete" style="width:300px;">
         <input type="text" #searchInput placeholder="City ...">
-        <div class="autocomplete-items">
-            <div *ngFor="let item of suggestions" (click)="selected($event.target)">
+        <div class="autocomplete-items" [ngClass]="{'display-none': !isShowSuggestions}">
+            <div *ngFor='let item of suggestionsOb$ | async' (click)='selected($event.target)'>
                 {{item}}
-            </div>  
+            </div>
         </div>
     </div>
 </form>
