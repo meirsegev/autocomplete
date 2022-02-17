@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,7 +45,7 @@ namespace AutoCompleteServerTests
                 HttpResponseMessage res = new HttpResponseMessage();
                 try
                 {
-                    res = await _httpClient.GetAsync($"http://localhost:5000/api/auto-complete/get-suggestions?prefix={_prefix}");
+                    res = await _httpClient.GetAsync($"http://localhost:8888/api/auto-complete/get-suggestions?prefix={_prefix}");
                 }
                 catch(Exception ex)
                 {
@@ -67,14 +68,13 @@ namespace AutoCompleteServerTests
             //autoCompleteService.StartAsync(ct).Wait();
 
             // create the dummy controller
-            
+            ServicePointManager.DefaultConnectionLimit = 200;
             List<GetSuggestionsWrapper> autoCompleteWrappers = new List<GetSuggestionsWrapper>();
 
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 10000; i++)
             {
                 string rand = RandomString(3);
-                var wrapper = new GetSuggestionsWrapper(rand, new HttpClient());
-                var res = await wrapper.CallToGetSuggestionsAsync();
+                var wrapper = new GetSuggestionsWrapper(rand, httpClient);
                 autoCompleteWrappers.Add(wrapper);
             }
 
@@ -83,6 +83,7 @@ namespace AutoCompleteServerTests
             st.Start();
             await Task.WhenAll(autoCompleteWrappers.Select(wr => wr.CallToGetSuggestionsAsync()));
             st.Stop();
+            httpClient.Dispose();
 
             var totalSeconds = st.ElapsedMilliseconds / 1000;
             var singleRequestAverageTimeSeconds = totalSeconds / 10000;
@@ -90,6 +91,7 @@ namespace AutoCompleteServerTests
             Console.WriteLine("Total seconds for 1000000 requests:", totalSeconds);
             Console.WriteLine($"average time for single request: {singleRequestAverageTimeSeconds}s");
             Assert.IsTrue(autoCompleteWrappers.All(v => v.Response.IsSuccessStatusCode));
+            Assert.IsTrue(totalSeconds <= 10);
         }
     }
 }

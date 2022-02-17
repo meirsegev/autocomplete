@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   backend:
-    image: autocomplete/backend:1.0.1
+    image: autocomplete/backend:1.0.2
     build:
       context: .
       dockerfile: ./server/Server/Dockerfile
@@ -14,7 +14,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
 
   frontend:
-    image: autocomplete/frontend:1.0.1
+    image: autocomplete/frontend:1.0.2
     build:
       context: .
       dockerfile: ./client/Dockerfile
