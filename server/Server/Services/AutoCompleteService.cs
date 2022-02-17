@@ -33,6 +33,8 @@ namespace Server.Services
 
         public async Task InitializeAsync(CancellationToken ct)
         {
+            _logger.LogDebug("Initiaizing AutoCompleteService");
+
             if (_isInitialized)
                 return;
 
@@ -47,6 +49,7 @@ namespace Server.Services
             await t;
 
             _isInitialized = true;
+            _logger.LogDebug("AutoCompleteService initialized");
         }
 
         // TBD - connect to db with async call

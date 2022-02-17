@@ -36,6 +36,7 @@ namespace Server.Controllers
         {
             try
             {
+                _logger.LogDebug($"get-suggestions called for: {prefix}");
                 var res = await _autoCompleteService.GetSuggestionsAsync(prefix, ct);
                 return res;
             }
