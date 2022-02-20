@@ -11,7 +11,7 @@ namespace Server.Tools
         {
             var rootNode = new TrieNode();
 
-            foreach (var word in words)
+            foreach (var word in words?? new List<string>())
             {
                 var iterableNode = rootNode;
                 var wordAsLower = word.ToLower();
@@ -34,14 +34,14 @@ namespace Server.Tools
             return rootNode;
         }
 
-        public static List<string> SearchWord(TrieNode rootNode, string word)
+        public static List<string> GetSuggestionsForPrefix(TrieNode rootNode, string prefix)
         {
-            if (string.IsNullOrEmpty(word))
+            if (string.IsNullOrEmpty(prefix))
                 return new List<string>();
 
             var iterableNode = rootNode;
 
-            foreach (var c in word)
+            foreach (var c in prefix)
             {
                 if (iterableNode.ContainsKey(c))
                     iterableNode = iterableNode.GetNodeByKey(c);

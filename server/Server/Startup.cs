@@ -29,6 +29,10 @@ namespace Server
             services.AddLogging();
             services.AddControllers();
             services.AddMvc();
+
+            // TBD - add configuration says which file to load
+            services.AddSingleton<IWordsListLoaderService, WordsListFromFileLoaderService>();
+            services.AddSingleton<ITrieStructBuilderService, TrieStructBuilderService>();
             services.AddHostedService<AutoCompleteService>()
                 .AddSingleton<IAutoCompleteService>(sp => sp
                 .GetServices<IHostedService>()

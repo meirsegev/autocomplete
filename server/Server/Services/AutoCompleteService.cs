@@ -12,12 +12,21 @@ namespace Server.Services
     public class AutoCompleteService : IAutoCompleteService
     {
         private bool _isInitialized = false;
-        private TrieNode _trieNode = null;
-        private ILogger<AutoCompleteService> _logger;
 
-        public AutoCompleteService(ILogger<AutoCompleteService> logger)
+        // TBD, move the trieNode to something like "TrieBuilderAndSearcherService"
+        // which is a singleton and holds the one and only trieStruct
+        private TrieNode _rootNode = null;
+        private ILogger<AutoCompleteService> _logger;
+        private IWordsListLoaderService _wordsListLoaderService;
+        private ITrieStructBuilderService _trieStructBuilderService;
+
+        public AutoCompleteService(ILogger<AutoCompleteService> logger, 
+            IWordsListLoaderService wordsListLoaderService,
+            ITrieStructBuilderService trieStructBuilderService)
         {
             _logger = logger;
+            _wordsListLoaderService = wordsListLoaderService;
+            _trieStructBuilderService = trieStructBuilderService;
         }
 
         public List<string> GetSuggestions(string prefix)
@@ -27,7 +36,7 @@ namespace Server.Services
                 _logger.LogError("GetSuggestions was called before auto complete service initialization");
                 return new List<string>();
             }
-            return TrieStruct.SearchWord(_trieNode, prefix);
+            return _trieStructBuilderService.GetSuggestionsForPrefix(_rootNode, prefix);
         }
 
         public async Task InitializeAsync(CancellationToken ct)
@@ -37,19 +46,20 @@ namespace Server.Services
             if (_isInitialized)
                 return;
                         
-            var words = await GetInitialWordsListAsync(ct);
-            _trieNode = TrieStruct.BuildTrieStruct(words);
-            _isInitialized = true;
+            try
+            {
+                // TBD, validate the "words" returned from the initial words service
+                var words = await _wordsListLoaderService.LoadInitialWordsListAsync(ct);
+                _rootNode = _trieStructBuilderService.BuildTrieStruct(words);
+                _isInitialized = true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex, $"Exception via InitializeAsync: {ex.StackTrace}");
+                throw ex;
+            }
             
             _logger.LogDebug("AutoCompleteService initialized");
-        }
-
-        private async Task<List<string>> GetInitialWordsListAsync(CancellationToken ct)
-        {
-            // in real implementation this should be an asnyc read from db of
-            // all city names and priority, here just from a file.
-            var cities = await CsvParser.GetAllCitiesAsync(ct);
-            return cities.Select(v => v.Name).ToList();
         }
 
         // This method is called before the server start serving requests,
