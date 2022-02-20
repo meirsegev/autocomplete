@@ -39,8 +39,8 @@ namespace Server.Services
                         
             var words = await GetInitialWordsListAsync(ct);
             _trieNode = TrieStruct.BuildTrieStruct(words);
-            
             _isInitialized = true;
+            
             _logger.LogDebug("AutoCompleteService initialized");
         }
 
