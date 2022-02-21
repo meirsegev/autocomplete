@@ -52,7 +52,7 @@ namespace AutoCompleteServerTests
                     return new HttpResponseMessage();
                 }
                 Response = res;
-                return res;
+                return Response;
             }
         }
 

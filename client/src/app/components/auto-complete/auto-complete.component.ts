@@ -1,7 +1,6 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { fromEvent, Observable, of, ReplaySubject, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged, repeat, tap, map, switchMap, filter, finalize, takeUntil, catchError } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { fromEvent, Observable, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, repeat, tap, map, switchMap, filter, finalize, catchError } from 'rxjs/operators';
 import { AutoCompleteService } from 'src/app/services/auto-complete.service';
 
 @Component({
@@ -21,7 +20,6 @@ export class AutoCompleteComponent implements OnInit, AfterViewInit {
   isShowSuggestions: boolean = true;
 
   constructor(
-    private http: HttpClient,
     private autoCompleteService: AutoCompleteService
   ) { }
 
